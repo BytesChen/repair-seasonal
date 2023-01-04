@@ -21,9 +21,9 @@ public class SeasonalRepair {
     public void repair() throws Exception {
         int dataLen = td_time.size();
 
-        for (int i = 0; i < dataLen; ++i) {
-            td_repair.add(td_dirty.get(i));
-        }
+//        for (int i = 0; i < dataLen; ++i) {
+//            td_repair.add(td_dirty.get(i));
+//        }
     }
 
     public ArrayList<Double> getTd_repair() {

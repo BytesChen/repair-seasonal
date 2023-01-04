@@ -1,5 +1,7 @@
 import Algorithm.*;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 public class Experiment {
@@ -28,12 +30,18 @@ public class Experiment {
         System.out.println("finish load data\n\n");
 
         // add noise
-//        System.out.println("start add noise");
-//        AddNoise addNoise = new AddNoise();
-//        ArrayList<Double> test_td = addNoise.getTd_dirty();
-//        System.out.println("end add noise");
+        System.out.println("start add noise");
+        AddNoise addNoise = new AddNoise(td_clean, 1, 1.0);
+        ArrayList<Double> td_dirty = addNoise.getTd_dirty();
+        System.out.println("end add noise");
 
         // repair
-//        Analysis sr = seasonalRepair(td_time,td_clean)
+//        Analysis sr = seasonalRepair(td_time, td_clean, td_dirty);
+        Analysis screen = screenRepair(td_time, td_clean, td_dirty);
+
+        System.out.println(
+//                sr.getRMSE() + "\n" +
+                screen.getRMSE()
+        );
     }
 }
