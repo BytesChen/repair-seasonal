@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
 
+import Algorithm.util.DualHeap;
+
 public class Experiment {
     private static final String dataPath = "data/cloudwise/dianwang_value_from2020-11-29to2020-12-06_10543.csv";
     private static final int dataLen = 10000;  // 时间序列大小
@@ -30,18 +32,18 @@ public class Experiment {
         System.out.println("finish load data\n\n");
 
         // add noise
-        System.out.println("start add noise");
-        AddNoise addNoise = new AddNoise(td_clean, 1, 1.0);
-        ArrayList<Double> td_dirty = addNoise.getTd_dirty();
-        System.out.println("end add noise");
+//        System.out.println("start add noise");
+//        AddNoise addNoise = new AddNoise(td_clean, 1, 1.0);
+//        ArrayList<Double> td_dirty = addNoise.getTd_dirty();
+//        System.out.println("end add noise");
 
         // repair
 //        Analysis sr = seasonalRepair(td_time, td_clean, td_dirty);
-        Analysis screen = screenRepair(td_time, td_clean, td_dirty);
+//        Analysis screen = screenRepair(td_time, td_clean, td_dirty);
 
-        System.out.println(
+//        System.out.println(
 //                sr.getRMSE() + "\n" +
-                screen.getRMSE()
-        );
+//                screen.getRMSE()
+//        );
     }
 }
