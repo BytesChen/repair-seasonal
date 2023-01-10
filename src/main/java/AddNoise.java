@@ -1,3 +1,7 @@
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -20,7 +24,8 @@ public class AddNoise {
 
         this.td_range = calRange();
 
-        this.addNoise();
+//        this.addNoise();
+        this.addNoiseTemp();
     }
 
     private double calRange() {  // data range
@@ -48,8 +53,31 @@ public class AddNoise {
         }
     }
 
+    private void addNoiseTemp() {
+        this.td_dirty.addAll(this.td_clean);
+
+        td_dirty.set(750, td_dirty.get(750) + 20000.0);
+    }
+
     public ArrayList<Double> getTd_dirty() {
         return td_dirty;
+    }
+
+    public void writeRepairResultToFile(String targetFileName) {
+        File writeFile = new File(targetFileName);
+        try {
+            BufferedWriter writeText = new BufferedWriter(new FileWriter(writeFile));
+            writeText.write("timestamp,value");
+            for (int j = 0; j < this.td_dirty.size(); j++) {
+                writeText.newLine();    //换行
+                double val = this.td_dirty.get(j);
+                writeText.write(j + "," + val);
+            }
+            writeText.flush();
+            writeText.close();
+        } catch (IOException e) {
+            System.out.println("Error");
+        }
     }
 
 }

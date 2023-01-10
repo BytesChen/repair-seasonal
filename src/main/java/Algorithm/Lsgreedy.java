@@ -1,31 +1,23 @@
 package Algorithm;
 
+import Algorithm.util.LsgreedyUtil;
 import Algorithm.util.ScreenUtil;
 
 import java.util.ArrayList;
 
-public class SCREEN {
+public class Lsgreedy {
     private final ArrayList<Long> td_time;
     private final ArrayList<Double> td_dirty;
     private final ArrayList<Double> td_repair = new ArrayList<>();
-//    private double minSpeeds;
-//    private double maxSpeeds;
 
-    public SCREEN(ArrayList<Long> td_time, ArrayList<Double> td_dirty) throws Exception {
+    public Lsgreedy(ArrayList<Long> td_time, ArrayList<Double> td_dirty) throws Exception {
         this.td_time = td_time;
         this.td_dirty = td_dirty;
         long startTime = System.currentTimeMillis();    //获取开始时间
         this.repair();
         long endTime = System.currentTimeMillis();    //获取结束时间
-        System.out.println("Screen time cost:" + (endTime - startTime) + "ms");    //输出程序运行时间
+        System.out.println("Lsgreedy time cost:" + (endTime - startTime) + "ms");
     }
-
-//    public SCREEN(ArrayList<Long> td_time, ArrayList<Double> td, double minSpeed, double maxSpeed) {
-//        this.td_time = td_time;
-//        this.td = td;
-//        this.minSpeeds = minSpeed;
-//        this.maxSpeeds = maxSpeed;
-//    }
 
     public ArrayList<Double> getTd_repair() {
         return td_repair;
@@ -36,9 +28,9 @@ public class SCREEN {
         double[] temp_dirty = this.arrayListToListDouble(this.td_dirty);
         double[] temp_repair;
 
-        ScreenUtil screenUtil = new ScreenUtil(times, temp_dirty);
-        screenUtil.repair();
-        temp_repair = screenUtil.getRepaired();
+        LsgreedyUtil lsgreedyUtil = new LsgreedyUtil(times, temp_dirty);
+        lsgreedyUtil.repair();
+        temp_repair = lsgreedyUtil.getRepaired();
 
         // listToArrayList
         for (int i = 0; i < this.td_dirty.size(); i++) {

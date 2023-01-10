@@ -10,19 +10,21 @@ public class SeasonalRepair {
     private final ArrayList<Double> td_dirty;
     private final ArrayList<Double> td_repair;
     private final int period;
-    private final double k = 10.0;  // k*mad
-    private final int max_iter = 10;
+    private final double k;  // k*mad
+    private final int max_iter;
 
     private double mid, mad;
     private ArrayList<Double> seasonal, trend, residual;
     private final DualHeap dh = new DualHeap();
     private final int size;
 
-    public SeasonalRepair(ArrayList<Long> td_time, ArrayList<Double> td_dirty, int period) throws Exception {
+    public SeasonalRepair(ArrayList<Long> td_time, ArrayList<Double> td_dirty, int period, double k, int max_iter) throws Exception {
         this.td_time = td_time;
         this.td_dirty = td_dirty;
         this.td_repair = td_dirty;
         this.period = period;
+        this.k = k;
+        this.max_iter = max_iter;
 
         this.size = td_dirty.size();
 

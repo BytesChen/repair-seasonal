@@ -6,11 +6,11 @@ import java.util.Map;
 import java.util.PriorityQueue;
 
 public class DualHeap {
-    private final PriorityQueue<Double> small;  // 大根堆，维护较小的一半元素
-    private final PriorityQueue<Double> large;  // 小根堆，维护较大的一半元素
-    private final Map<Double, Integer> delayed;  // 哈希表，记录"延迟删除"的元素，key 为元素，value 为需要删除的次数
+    private final PriorityQueue<Double> small;  // max-heap
+    private final PriorityQueue<Double> large;  // min-heap
+    private final Map<Double, Integer> delayed;  // delay to delete hashset
 
-    private int smallSize, largeSize;  // 大根堆,小根堆包含的元素个数，需要扣除被"延迟删除"的元素
+    private int smallSize, largeSize;  // size of heap(without the delayed)
 
     public DualHeap() {
         this.small = new PriorityQueue<>(Comparator.reverseOrder());
@@ -36,7 +36,7 @@ public class DualHeap {
         makeBalance();
     }
 
-    public void erase(double num) {  // 删除的数没有添加并不会报错
+    public void erase(double num) {
         delayed.put(num, delayed.getOrDefault(num, 0) + 1);
         if (num <= small.peek()) {
             --smallSize;
