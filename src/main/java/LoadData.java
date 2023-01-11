@@ -15,6 +15,9 @@ public class LoadData {
 
     public void loadTimeSeriesData(String filename) throws FileNotFoundException {
         Scanner sc = new Scanner(new File(filename));
+
+        double max_v = Double.MIN_VALUE, min_v = Double.MAX_VALUE;
+
         sc.nextLine();  // skip table header
         for (int k = dataLen; k > 0 && sc.hasNextLine(); --k) {  // the size of td_clean is dataLen
             String[] line_str = sc.nextLine().split(",");
@@ -24,7 +27,13 @@ public class LoadData {
             // td_clean
             double v = Double.parseDouble(line_str[1]);
             this.td_clean.add(v);
+            // standardize_prepare
+            if (v > max_v) max_v = v;
+            if (v < min_v) min_v = v;
         }
+        // standardize
+        for (int i = 0; i < td_clean.size(); ++i)
+            td_clean.set(i, (td_clean.get(i) - min_v) / (max_v - min_v) * 10.0);
     }
 
     public ArrayList<Double> getTd_clean() {

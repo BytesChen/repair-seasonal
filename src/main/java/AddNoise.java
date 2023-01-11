@@ -5,27 +5,31 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Random;
 
 public class AddNoise {
     private final ArrayList<Double> td_clean;
     private final ArrayList<Double> td_dirty = new ArrayList<>();
 
-    private final double td_range;  // time series data range
-
     private final int err_rate;  // error rate rate/1000
     private final double err_range;  // error range
+    private final int err_length;  // error rate rate/1000
 
-    public AddNoise(ArrayList<Double> td_clean, int rate, double range) {
+    private final double td_range;  // time series data range
+    private final Random random;
+
+    public AddNoise(ArrayList<Double> td_clean, int rate, double range, int length, int seed) throws Exception {
         this.td_clean = td_clean;
 
         this.err_rate = rate;
         this.err_range = range;
+        this.err_length = length;
+        this.random = new Random(seed);
 
         this.td_range = calRange();
 
-        this.addNoise();
-//        this.addNoiseTemp();
+        addNoise();
     }
 
     private double calRange() {  // data range
@@ -38,40 +42,24 @@ public class AddNoise {
     }
 
     private void addNoise() {
-        Random random = new Random(666);
-
+        int err_flag = 0;
+        double err_range_now = 0.0;
         for (Double value : this.td_clean) {
-            int thr = random.nextInt(1000);
-            if (thr < this.err_rate) {
-                double new_value = value + random.nextGaussian() * this.td_range * this.err_range;
-                BigDecimal b = new BigDecimal(new_value);  // 精确的小数位保留2位四舍五入处理
-                this.td_dirty.add(b.setScale(5, RoundingMode.HALF_UP).doubleValue());
-            } else {
-                this.td_dirty.add(value);
-            }
-        }
-    }
-
-    private void addNoiseSeg() {
-        Random random = new Random(666);
-
-        for (Double value : this.td_clean) {
-            Random r = new Random();
-            int i1 = r.nextInt(1000);
+            int i1 = random.nextInt(1000);
             if (i1 < this.err_rate) {
-                double new_value = value + random.nextGaussian() * this.td_range * this.err_range;
+                err_flag = err_length;
+                err_range_now = random.nextGaussian() * this.td_range * this.err_range;
+            }
+
+            if (err_flag > 0) {
+                --err_flag;
+                double new_value = value + err_range_now;
                 BigDecimal b = new BigDecimal(new_value);  // 精确的小数位保留2位四舍五入处理
-                this.td_dirty.add(b.setScale(5, RoundingMode.HALF_UP).doubleValue());
+                this.td_dirty.add(b.setScale(8, RoundingMode.HALF_UP).doubleValue());
             } else {
                 this.td_dirty.add(value);
             }
         }
-    }
-
-    private void addNoiseTemp() {
-        this.td_dirty.addAll(this.td_clean);
-
-        td_dirty.set(750, td_dirty.get(750) + 20000.0);
     }
 
     public ArrayList<Double> getTd_dirty() {

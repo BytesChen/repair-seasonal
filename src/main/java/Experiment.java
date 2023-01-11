@@ -4,7 +4,8 @@ import java.util.*;
 
 public class Experiment {
     private static final String dataPath = "./data/power_consumption/Tetuan_city_power_consumption_zone_3_52416.csv";
-    private static final int dataLen = 50000;  // 时间序列大小
+    //    private static final String dataPath = "./data/cloudwise/dianwang_value_from2020-11-29to2020-12-06_10543.csv";
+    private static final int dataLen = 10000;  // 时间序列大小
 
     public static Analysis classicalSeasonalRepair(ArrayList<Long> td_time, ArrayList<Double> td_clean, ArrayList<Double> td_dirty, int period, double k, int max_iter) throws Exception {
         System.out.println("\nclassicalSeasonalRepair");
@@ -50,26 +51,26 @@ public class Experiment {
 
         // add noise
         System.out.println("start add noise");
-        AddNoise addNoise = new AddNoise(td_clean, 1, 0.5);
+        AddNoise addNoise = new AddNoise(td_clean, 2, 1.0, 9, 1);
         ArrayList<Double> td_dirty = addNoise.getTd_dirty();
         System.out.println("end add noise");
 
 //        addNoise.writeRepairResultToFile("./dataTemp/_power_dirty.csv");
 
         // repair
-        Analysis csr = classicalSeasonalRepair(td_time, td_clean, td_dirty, 144, 0.005, 10);
-        Analysis isr = improvedSeasonalRepair(td_time, td_clean, td_dirty, 144, 15.6, 10);
+        Analysis csr = classicalSeasonalRepair(td_time, td_clean, td_dirty, 144, 9, 10);
+        Analysis isr = improvedSeasonalRepair(td_time, td_clean, td_dirty, 144, 21, 10);
         Analysis screen = screenRepair(td_time, td_clean, td_dirty);
         Analysis lsgreedy = lsgreedyRepair(td_time, td_clean, td_dirty);
         Analysis ewma = ewmaRepair(td_time, td_clean, td_dirty);
 
         //save
-        csr.writeRepairResultToFile("./dataTemp/_csr_power_repair.csv");
-        isr.writeRepairResultToFile("./dataTemp/_isr_power_repair.csv");
-        screen.writeRepairResultToFile("./dataTemp/_screen_power_repair.csv");
-        lsgreedy.writeRepairResultToFile("./dataTemp/_lsgreedy_power_repair.csv");
-        ewma.writeRepairResultToFile("./dataTemp/_ewma_power_repair.csv");
-
+//        csr.writeRepairResultToFile("./dataTemp/_csr_power_repair.csv");
+//        isr.writeRepairResultToFile("./dataTemp/_isr_power_repair.csv");
+//        screen.writeRepairResultToFile("./dataTemp/_screen_power_repair.csv");
+//        lsgreedy.writeRepairResultToFile("./dataTemp/_lsgreedy_power_repair.csv");
+//        ewma.writeRepairResultToFile("./dataTemp/_ewma_power_repair.csv");
+//
         System.out.println(
                 "\n" +
                         "csr : " + csr.getRMSE() + "\n" +
