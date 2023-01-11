@@ -1,8 +1,7 @@
 package Algorithm.util;
 
 import java.util.ArrayList;
-
-import Algorithm.util.DualHeap;
+import java.util.Objects;
 
 public class Decomposition {
     private final ArrayList<Long> td_time;
@@ -14,29 +13,124 @@ public class Decomposition {
     private final ArrayList<Double> trend = new ArrayList<>();
     private final ArrayList<Double> residual = new ArrayList<>();
 
-    public Decomposition(ArrayList<Long> td_time, ArrayList<Double> td, int period, String mode) {
+    public Decomposition(ArrayList<Long> td_time, ArrayList<Double> td, int period, String method, String mode) throws Exception {
         this.td = td;
         this.td_time = td_time;
         this.period = period;
         this.mode = mode;
 
-        this.decompose();
+        if (Objects.equals(method, "classical"))
+            this.classical_decompose();
+        else if (Objects.equals(method, "improved"))
+            this.improved_decompose();
+        else {
+            throw new Exception("Error: Method should be \"classical\" or \"improved\".");
+        }
     }
 
-    public Decomposition(ArrayList<Long> td_time, ArrayList<Double> td, int period) {
+    public Decomposition(ArrayList<Long> td_time, ArrayList<Double> td, int period, String method) throws Exception {
         this.td = td;
         this.td_time = td_time;
         this.period = period;
-        this.mode = "constant";
+        this.mode = "ar";
 
-        this.decompose();
+        if (Objects.equals(method, "classical"))
+            this.classical_decompose();
+        else if (Objects.equals(method, "improved"))
+            this.improved_decompose();
+        else {
+            throw new Exception("Error: Method should be \"classical\" or \"improved\".");
+        }
     }
 
-    private void decompose() {
-        if (period > td.size()) {  // error
-            System.out.println("Error: Period exceed the size of time series!");
-            return;
+    private void classical_decompose() throws Exception {
+        if (period > td.size())
+            throw new Exception("Error: Period exceed the size of time series!");
+
+        // structure
+        ArrayList<Double> de_trend = new ArrayList<>();
+        // constant
+        int interval = period / 2;
+        int size = td.size();
+
+        // step 1: trend
+        for (int i = 0; i < interval; ++i) trend.add(Double.NaN);  // head null
+
+        double ma = 0.0;
+        if (period % 2 == 1) {
+            // initial
+            for (int i = 0; i < period; ++i) ma += td.get(i);
+            trend.add(ma / period);
+            // moving median
+            for (int i = period; i < size; ++i) {
+                ma += td.get(i);
+                ma -= td.get(i - period);
+                trend.add(ma / period);
+            }
+        } else {
+            // initial
+            double temp = (td.get(0) + td.get(period)) / 2.0;
+            ma += temp;
+            for (int i = 1; i < period; ++i) ma += td.get(i);
+            trend.add(ma / period);
+            ma -= temp;
+            // moving median
+            for (int i = period; i < size - 1; ++i) {
+                ma += td.get(i);
+                ma -= td.get(i - period + 1);
+                temp = (td.get(i - period + 1) + td.get(i + 1)) / 2.0;
+                ma += temp;
+                trend.add(ma / period);
+                ma -= temp;
+            }
         }
+        ma = 0.0;
+
+        for (int i = 0; i < interval; ++i) trend.add(Double.NaN);  // tail null
+
+        // step 2: de-trend
+        for (int i = 0; i < size; ++i)
+            de_trend.add(td.get(i) - trend.get(i));
+
+        // step 3: seasonal
+        double cycle_cnt = 0.0;
+        for (int i = 0; i < period; ++i) {
+            // in each cycle
+            for (int j = 0; j < size / period; ++j)
+                if (!Double.isNaN(de_trend.get(j * period + i))) {
+                    cycle_cnt += 1.0;
+                    ma += de_trend.get(j * period + i);
+                }
+            if (i < size % period && !Double.isNaN(de_trend.get(i + (size / period) * period))) {
+                cycle_cnt += 1.0;
+                ma += de_trend.get(i + (size / period) * period);
+            }
+            seasonal.add(ma / cycle_cnt);
+            cycle_cnt = 0.0;
+            ma = 0.0;
+        }
+
+        // de-mean
+        for (int i = 0; i < period; ++i)
+            ma += seasonal.get(i);
+        double mean_s = ma / period;
+        for (int i = 0; i < period; ++i)
+            seasonal.set(i, seasonal.get(i) - mean_s);
+        ma = 0.0;
+
+        // extend
+        for (int i = period; i < size; ++i)
+            seasonal.add(seasonal.get(i % period));
+
+        // step 3: residual
+        for (int i = 0; i < size; ++i)
+            residual.add(de_trend.get(i) - seasonal.get(i));
+    }
+
+    private void improved_decompose() throws Exception {
+        if (period > td.size())
+            throw new Exception("Error: Period exceed the size of time series!");
+
         // structure
         ArrayList<Double> de_trend = new ArrayList<>();
         DualHeap dh = new DualHeap();
@@ -157,9 +251,6 @@ public class Decomposition {
         mean_epsilon /= cnt_epsilon;
         var_epsilon /= cnt_epsilon;
 
-        System.out.println(theta);
-        System.out.println(mean_epsilon);
-
         for (int i = interval; i > 0; --i)
             trend.set(i - 1, (trend.get(i) - mean_epsilon) / theta);
         for (int i = trend.size() - interval - 1; i < trend.size() - 1; ++i)
@@ -178,10 +269,10 @@ public class Decomposition {
         return residual;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         ArrayList<Long> td_t = new ArrayList<>();
         ArrayList<Double> td_s = new ArrayList<>();
-        td_s.add(5.0);
+        td_s.add(1.0);
         td_s.add(3.0);
         td_s.add(7.0);
         td_s.add(8.0);
@@ -189,8 +280,8 @@ public class Decomposition {
         td_s.add(6.0);
         td_s.add(10.6);
 
-        Decomposition de = new Decomposition(td_t, td_s, 3);
-        for (double d : de.getTrend()) {
+        Decomposition de = new Decomposition(td_t, td_s, 3, "classical");
+        for (double d : de.getResidual()) {
             System.out.print(d + " ");
         }
     }

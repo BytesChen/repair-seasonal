@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import Algorithm.util.DualHeap;
 import Algorithm.util.Decomposition;
 
-public class SeasonalRepair {
+public class ImprovedSeasonal {
     private final ArrayList<Long> td_time;
     private final ArrayList<Double> td_dirty;
-    private final ArrayList<Double> td_repair;
+    private final ArrayList<Double> td_repair = new ArrayList<>();
     private final int period;
     private final double k;  // k*mad
     private final int max_iter;
@@ -18,10 +18,9 @@ public class SeasonalRepair {
     private final DualHeap dh = new DualHeap();
     private final int size;
 
-    public SeasonalRepair(ArrayList<Long> td_time, ArrayList<Double> td_dirty, int period, double k, int max_iter) throws Exception {
+    public ImprovedSeasonal(ArrayList<Long> td_time, ArrayList<Double> td_dirty, int period, double k, int max_iter) throws Exception {
         this.td_time = td_time;
         this.td_dirty = td_dirty;
-        this.td_repair = td_dirty;
         this.period = period;
         this.k = k;
         this.max_iter = max_iter;
@@ -31,12 +30,14 @@ public class SeasonalRepair {
         long startTime = System.currentTimeMillis();
         this.repair();
         long endTime = System.currentTimeMillis();
-        System.out.println("Time cost:" + (endTime - startTime) + "ms");
+        System.out.println("ImprovedSeasonal time cost:" + (endTime - startTime) + "ms");
     }
 
     private void repair() throws Exception {
+        td_repair.addAll(td_dirty);
+
         for (int h = 0; h < max_iter; ++h) {
-            Decomposition de = new Decomposition(td_time, td_repair, period, "constant");
+            Decomposition de = new Decomposition(td_time, td_repair, period, "improved", "constant");
             seasonal = de.getSeasonal();
             trend = de.getTrend();
             residual = de.getResidual();
@@ -88,10 +89,5 @@ public class SeasonalRepair {
 
     public ArrayList<Double> getTd_repair() {
         return td_repair;
-    }
-
-    public static void main(String[] args) {
-//        double a = 144.0, b = 23.0;
-//        System.out.println(a > b ? a - b : b - a);
     }
 }

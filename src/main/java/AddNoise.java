@@ -24,8 +24,8 @@ public class AddNoise {
 
         this.td_range = calRange();
 
-//        this.addNoise();
-        this.addNoiseTemp();
+        this.addNoise();
+//        this.addNoiseTemp();
     }
 
     private double calRange() {  // data range
@@ -38,6 +38,21 @@ public class AddNoise {
     }
 
     private void addNoise() {
+        Random random = new Random(666);
+
+        for (Double value : this.td_clean) {
+            int thr = random.nextInt(1000);
+            if (thr < this.err_rate) {
+                double new_value = value + random.nextGaussian() * this.td_range * this.err_range;
+                BigDecimal b = new BigDecimal(new_value);  // 精确的小数位保留2位四舍五入处理
+                this.td_dirty.add(b.setScale(5, RoundingMode.HALF_UP).doubleValue());
+            } else {
+                this.td_dirty.add(value);
+            }
+        }
+    }
+
+    private void addNoiseSeg() {
         Random random = new Random(666);
 
         for (Double value : this.td_clean) {

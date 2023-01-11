@@ -1,19 +1,22 @@
 import Algorithm.*;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.*;
-
-import Algorithm.util.DualHeap;
 
 public class Experiment {
     private static final String dataPath = "./data/power_consumption/Tetuan_city_power_consumption_zone_3_52416.csv";
-    private static final int dataLen = 2000;  // 时间序列大小
+    private static final int dataLen = 50000;  // 时间序列大小
 
-    public static Analysis seasonalRepair(ArrayList<Long> td_time, ArrayList<Double> td_clean, ArrayList<Double> td_dirty, int period, double k, int max_iter) throws Exception {
-        System.out.println("\nSeasonalRepair");
-        SeasonalRepair seasonalRepair = new SeasonalRepair(td_time, td_dirty, period, k, max_iter);
-        ArrayList<Double> td_repair = seasonalRepair.getTd_repair();
+    public static Analysis classicalSeasonalRepair(ArrayList<Long> td_time, ArrayList<Double> td_clean, ArrayList<Double> td_dirty, int period, double k, int max_iter) throws Exception {
+        System.out.println("\nclassicalSeasonalRepair");
+        ClassicalSeasonal classicalSeasonal = new ClassicalSeasonal(td_time, td_dirty, period, k, max_iter);
+        ArrayList<Double> td_repair = classicalSeasonal.getTd_repair();
+        return new Analysis(td_time, td_clean, td_repair);
+    }
+
+    public static Analysis improvedSeasonalRepair(ArrayList<Long> td_time, ArrayList<Double> td_clean, ArrayList<Double> td_dirty, int period, double k, int max_iter) throws Exception {
+        System.out.println("\nimprovedSeasonalRepair");
+        ImprovedSeasonal improvedSeasonal = new ImprovedSeasonal(td_time, td_dirty, period, k, max_iter);
+        ArrayList<Double> td_repair = improvedSeasonal.getTd_repair();
         return new Analysis(td_time, td_clean, td_repair);
     }
 
@@ -47,27 +50,30 @@ public class Experiment {
 
         // add noise
         System.out.println("start add noise");
-        AddNoise addNoise = new AddNoise(td_clean, 1, 1.0);
+        AddNoise addNoise = new AddNoise(td_clean, 1, 0.5);
         ArrayList<Double> td_dirty = addNoise.getTd_dirty();
         System.out.println("end add noise");
 
-        addNoise.writeRepairResultToFile("./dataTemp/_power_dirty.csv");
+//        addNoise.writeRepairResultToFile("./dataTemp/_power_dirty.csv");
 
         // repair
-        Analysis sri = seasonalRepair(td_time, td_clean, td_dirty, 144, 10, 10);
+        Analysis csr = classicalSeasonalRepair(td_time, td_clean, td_dirty, 144, 0.005, 10);
+        Analysis isr = improvedSeasonalRepair(td_time, td_clean, td_dirty, 144, 15.6, 10);
         Analysis screen = screenRepair(td_time, td_clean, td_dirty);
         Analysis lsgreedy = lsgreedyRepair(td_time, td_clean, td_dirty);
         Analysis ewma = ewmaRepair(td_time, td_clean, td_dirty);
 
         //save
-        sri.writeRepairResultToFile("./dataTemp/_sri_power_repair.csv");
+        csr.writeRepairResultToFile("./dataTemp/_csr_power_repair.csv");
+        isr.writeRepairResultToFile("./dataTemp/_isr_power_repair.csv");
         screen.writeRepairResultToFile("./dataTemp/_screen_power_repair.csv");
         lsgreedy.writeRepairResultToFile("./dataTemp/_lsgreedy_power_repair.csv");
         ewma.writeRepairResultToFile("./dataTemp/_ewma_power_repair.csv");
 
         System.out.println(
                 "\n" +
-                        "sri : " + sri.getRMSE() + "\n" +
+                        "csr : " + csr.getRMSE() + "\n" +
+                        "isr : " + isr.getRMSE() + "\n" +
                         "screen : " + screen.getRMSE() + "\n" +
                         "lsgreedy : " + lsgreedy.getRMSE() + "\n" +
                         "ewma : " + ewma.getRMSE() + "\n" +
