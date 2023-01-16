@@ -43,7 +43,7 @@ public class Analysis {
             BufferedWriter writeText = new BufferedWriter(new FileWriter(writeFile));
             writeText.write("timestamp,value");
             for (int j = 0; j < this.td_repair.size(); j++) {
-                writeText.newLine();    //换行
+                writeText.newLine();
                 double val = this.td_repair.get(j);
                 writeText.write(j + "," + val);
             }

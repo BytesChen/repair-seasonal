@@ -60,7 +60,6 @@ public class DualHeap {
         largeSize = 0;
     }
 
-    // 不断地弹出 heap 的堆顶元素，并且更新哈希表
     private void prune(PriorityQueue<Double> heap) {
         while (!heap.isEmpty()) {
             double num = heap.peek();
@@ -76,21 +75,16 @@ public class DualHeap {
         }
     }
 
-    // 调整 small 和 large 中的元素个数，使得二者的元素个数满足要求
     private void makeBalance() {
         if (smallSize > largeSize + 1) {
-            // small 比 large 元素多 2 个
             large.offer(small.poll());
             --smallSize;
             ++largeSize;
-            // small 堆顶元素被移除，需要进行 prune
             prune(small);
         } else if (smallSize < largeSize) {
-            // large 比 small 元素多 1 个
             small.offer(large.poll());
             ++smallSize;
             --largeSize;
-            // large 堆顶元素被移除，需要进行 prune
             prune(large);
         }
     }

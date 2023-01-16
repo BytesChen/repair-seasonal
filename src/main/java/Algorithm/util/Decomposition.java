@@ -21,10 +21,10 @@ public class Decomposition {
 
         if (Objects.equals(method, "classical"))
             this.classical_decompose();
-        else if (Objects.equals(method, "improved"))
-            this.improved_decompose();
+        else if (Objects.equals(method, "robust"))
+            this.robust_decompose();
         else {
-            throw new Exception("Error: Method should be \"classical\" or \"improved\".");
+            throw new Exception("Error: Method should be \"classical\" or \"robust\".");
         }
     }
 
@@ -36,10 +36,10 @@ public class Decomposition {
 
         if (Objects.equals(method, "classical"))
             this.classical_decompose();
-        else if (Objects.equals(method, "improved"))
-            this.improved_decompose();
+        else if (Objects.equals(method, "robust"))
+            this.robust_decompose();
         else {
-            throw new Exception("Error: Method should be \"classical\" or \"improved\".");
+            throw new Exception("Error: Method should be \"classical\" or \"robust\".");
         }
     }
 
@@ -127,7 +127,7 @@ public class Decomposition {
             residual.add(de_trend.get(i) - seasonal.get(i));
     }
 
-    private void improved_decompose() throws Exception {
+    private void robust_decompose() throws Exception {
         if (period > td.size())
             throw new Exception("Error: Period exceed the size of time series!");
 
@@ -267,22 +267,5 @@ public class Decomposition {
 
     public ArrayList<Double> getResidual() {
         return residual;
-    }
-
-    public static void main(String[] args) throws Exception {
-        ArrayList<Long> td_t = new ArrayList<>();
-        ArrayList<Double> td_s = new ArrayList<>();
-        td_s.add(1.0);
-        td_s.add(3.0);
-        td_s.add(7.0);
-        td_s.add(8.0);
-        td_s.add(9.0);
-        td_s.add(6.0);
-        td_s.add(10.6);
-
-        Decomposition de = new Decomposition(td_t, td_s, 3, "classical");
-        for (double d : de.getResidual()) {
-            System.out.print(d + " ");
-        }
     }
 }

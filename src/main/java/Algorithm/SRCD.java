@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import Algorithm.util.Decomposition;
 
-public class ClassicalSeasonal {
+public class SRCD {
     private final ArrayList<Long> td_time;
     private final ArrayList<Double> td_dirty;
     private final ArrayList<Double> td_repair = new ArrayList<>();
@@ -16,7 +16,7 @@ public class ClassicalSeasonal {
     private ArrayList<Double> seasonal, trend, residual;
     private final int size;
 
-    public ClassicalSeasonal(ArrayList<Long> td_time, ArrayList<Double> td_dirty, int period, double k, int max_iter) throws Exception {
+    public SRCD(ArrayList<Long> td_time, ArrayList<Double> td_dirty, int period, double k, int max_iter) throws Exception {
         this.td_time = td_time;
         this.td_dirty = td_dirty;
         this.period = period;
@@ -28,7 +28,7 @@ public class ClassicalSeasonal {
         long startTime = System.currentTimeMillis();
         this.repair();
         long endTime = System.currentTimeMillis();
-        System.out.println("ClassicalSeasonal time cost:" + (endTime - startTime) + "ms");
+        System.out.println("SRCD time cost:" + (endTime - startTime) + "ms");
     }
 
     private void repair() throws Exception {

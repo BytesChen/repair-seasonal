@@ -3,22 +3,22 @@ import Algorithm.*;
 import java.util.*;
 
 public class Experiment {
-//    private static final String dataPath = "./data/cloudwise/dianwang_value_from2020-11-29to2020-12-06_10543.csv";
+        private static final String dataPath = "./data/grid/grid_value_from2020-11-29to2020-12-06_10543.csv";
 //    private static final String dataPath = "./data/power_consumption/Tetuan_city_power_consumption_zone_3_52416.csv";
-    private static final String dataPath = "./data/synthetic/final_1000000.csv";
-    private static final int dataLen = 1000000;  // 时间序列大小
+//    private static final String dataPath = "./data/synthetic/final_1000000.csv";
+    private static final int dataLen = 10000;
 
-    public static Analysis classicalSeasonalRepair(ArrayList<Long> td_time, ArrayList<Double> td_clean, ArrayList<Double> td_dirty, int period, double k, int max_iter) throws Exception {
-        System.out.println("\nclassicalSeasonalRepair");
-        ClassicalSeasonal classicalSeasonal = new ClassicalSeasonal(td_time, td_dirty, period, k, max_iter);
-        ArrayList<Double> td_repair = classicalSeasonal.getTd_repair();
+    public static Analysis srcdRepair(ArrayList<Long> td_time, ArrayList<Double> td_clean, ArrayList<Double> td_dirty, int period, double k, int max_iter) throws Exception {
+        System.out.println("\nSRCD");
+        SRCD srcd = new SRCD(td_time, td_dirty, period, k, max_iter);
+        ArrayList<Double> td_repair = srcd.getTd_repair();
         return new Analysis(td_time, td_clean, td_repair);
     }
 
-    public static Analysis improvedSeasonalRepair(ArrayList<Long> td_time, ArrayList<Double> td_clean, ArrayList<Double> td_dirty, int period, double k, int max_iter) throws Exception {
-        System.out.println("\nimprovedSeasonalRepair");
-        ImprovedSeasonal improvedSeasonal = new ImprovedSeasonal(td_time, td_dirty, period, k, max_iter);
-        ArrayList<Double> td_repair = improvedSeasonal.getTd_repair();
+    public static Analysis srrdRepair(ArrayList<Long> td_time, ArrayList<Double> td_clean, ArrayList<Double> td_dirty, int period, double k, int max_iter) throws Exception {
+        System.out.println("\nSRRD");
+        SRRD srrd = new SRRD(td_time, td_dirty, period, k, max_iter);
+        ArrayList<Double> td_repair = srrd.getTd_repair();
         return new Analysis(td_time, td_clean, td_repair);
     }
 
@@ -59,8 +59,8 @@ public class Experiment {
 //        addNoise.writeRepairResultToFile("./dataTemp/_power_dirty.csv");
 
         // repair
-        Analysis csr = classicalSeasonalRepair(td_time, td_clean, td_dirty, 100, 9, 10);
-        Analysis isr = improvedSeasonalRepair(td_time, td_clean, td_dirty, 100, 10, 10);
+        Analysis srcd = srcdRepair(td_time, td_clean, td_dirty, 100, 9, 10);
+        Analysis srrd = srrdRepair(td_time, td_clean, td_dirty, 100, 10, 10);
         Analysis screen = screenRepair(td_time, td_clean, td_dirty);
         Analysis lsgreedy = lsgreedyRepair(td_time, td_clean, td_dirty);
         Analysis ewma = ewmaRepair(td_time, td_clean, td_dirty);
@@ -74,8 +74,8 @@ public class Experiment {
 //
         System.out.println(
                 "\n" +
-                        "csr : " + csr.getRMSE() + "\n" +
-                        "isr : " + isr.getRMSE() + "\n" +
+                        "srcd : " + srcd.getRMSE() + "\n" +
+                        "srrd : " + srrd.getRMSE() + "\n" +
                         "screen : " + screen.getRMSE() + "\n" +
                         "lsgreedy : " + lsgreedy.getRMSE() + "\n" +
                         "ewma : " + ewma.getRMSE() + "\n" +

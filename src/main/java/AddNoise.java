@@ -54,7 +54,7 @@ public class AddNoise {
             if (err_flag > 0) {
                 --err_flag;
                 double new_value = value + err_range_now;
-                BigDecimal b = new BigDecimal(new_value);  // 精确的小数位保留2位四舍五入处理
+                BigDecimal b = new BigDecimal(new_value);
                 this.td_dirty.add(b.setScale(8, RoundingMode.HALF_UP).doubleValue());
             } else {
                 this.td_dirty.add(value);
@@ -72,7 +72,7 @@ public class AddNoise {
             BufferedWriter writeText = new BufferedWriter(new FileWriter(writeFile));
             writeText.write("timestamp,value");
             for (int j = 0; j < this.td_dirty.size(); j++) {
-                writeText.newLine();    //换行
+                writeText.newLine();
                 double val = this.td_dirty.get(j);
                 writeText.write(j + "," + val);
             }

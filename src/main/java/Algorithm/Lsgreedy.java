@@ -13,9 +13,9 @@ public class Lsgreedy {
     public Lsgreedy(ArrayList<Long> td_time, ArrayList<Double> td_dirty) throws Exception {
         this.td_time = td_time;
         this.td_dirty = td_dirty;
-        long startTime = System.currentTimeMillis();    //获取开始时间
+        long startTime = System.currentTimeMillis();
         this.repair();
-        long endTime = System.currentTimeMillis();    //获取结束时间
+        long endTime = System.currentTimeMillis();
         System.out.println("Lsgreedy time cost:" + (endTime - startTime) + "ms");
     }
 
