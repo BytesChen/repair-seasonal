@@ -37,7 +37,7 @@ public class SRRD {
         td_repair.addAll(td_dirty);
 
         for (int h = 0; h < max_iter; ++h) {
-            Decomposition de = new Decomposition(td_time, td_repair, period, "robust", "constant");
+            Decomposition de = new Decomposition(td_time, td_repair, period, "robust");
             seasonal = de.getSeasonal();
             trend = de.getTrend();
             residual = de.getResidual();

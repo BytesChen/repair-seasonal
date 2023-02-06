@@ -3,9 +3,9 @@ import Algorithm.*;
 import java.util.*;
 
 public class Experiment {
-        private static final String dataPath = "./data/grid/grid_value_from2020-11-29to2020-12-06_10543.csv";
+    //    private static final String dataPath = "./data/grid/grid_value_from2020-11-29to2020-12-06_10543.csv";
 //    private static final String dataPath = "./data/power_consumption/Tetuan_city_power_consumption_zone_3_52416.csv";
-//    private static final String dataPath = "./data/synthetic/final_1000000.csv";
+    private static final String dataPath = "./data/synthetic/final_1000000.csv";
     private static final int dataLen = 10000;
 
     public static Analysis srcdRepair(ArrayList<Long> td_time, ArrayList<Double> td_clean, ArrayList<Double> td_dirty, int period, double k, int max_iter) throws Exception {
@@ -66,12 +66,12 @@ public class Experiment {
         Analysis ewma = ewmaRepair(td_time, td_clean, td_dirty);
 
         //save
-//        csr.writeRepairResultToFile("./output/csr_power_repair.csv");
-//        isr.writeRepairResultToFile("./output/isr_power_repair.csv");
+//        srcd.writeRepairResultToFile("./output/csr_power_repair.csv");
+//        srrd.writeRepairResultToFile("./output/isr_power_repair.csv");
 //        screen.writeRepairResultToFile("./output/screen_power_repair.csv");
 //        lsgreedy.writeRepairResultToFile("./output/lsgreedy_power_repair.csv");
 //        ewma.writeRepairResultToFile("./output/ewma_power_repair.csv");
-//
+
         System.out.println(
                 "\n" +
                         "srcd : " + srcd.getRMSE() + "\n" +

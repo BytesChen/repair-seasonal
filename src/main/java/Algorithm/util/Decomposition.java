@@ -7,32 +7,15 @@ public class Decomposition {
     private final ArrayList<Long> td_time;
     private final ArrayList<Double> td;
     private final int period;
-    private final String mode;
 
     private final ArrayList<Double> seasonal = new ArrayList<>();
     private final ArrayList<Double> trend = new ArrayList<>();
     private final ArrayList<Double> residual = new ArrayList<>();
 
-    public Decomposition(ArrayList<Long> td_time, ArrayList<Double> td, int period, String method, String mode) throws Exception {
-        this.td = td;
-        this.td_time = td_time;
-        this.period = period;
-        this.mode = mode;
-
-        if (Objects.equals(method, "classical"))
-            this.classical_decompose();
-        else if (Objects.equals(method, "robust"))
-            this.robust_decompose();
-        else {
-            throw new Exception("Error: Method should be \"classical\" or \"robust\".");
-        }
-    }
-
     public Decomposition(ArrayList<Long> td_time, ArrayList<Double> td, int period, String method) throws Exception {
         this.td = td;
         this.td_time = td_time;
         this.period = period;
-        this.mode = "ar";
 
         if (Objects.equals(method, "classical"))
             this.classical_decompose();
@@ -116,7 +99,6 @@ public class Decomposition {
         double mean_s = ma / period;
         for (int i = 0; i < period; ++i)
             seasonal.set(i, seasonal.get(i) - mean_s);
-        ma = 0.0;
 
         // extend
         for (int i = period; i < size; ++i)
@@ -173,11 +155,8 @@ public class Decomposition {
         for (int i = 0; i < interval; ++i) trend.add(0.0);  // tail null
 
         // trend extension
-        if (mode.equals("constant")) {
-            constant_ext();
-        } else if (mode.equals("ar")) {
-            ar_ext();
-        }
+//        constant_ext();
+        ar_ext();
 
         // step 2: de-trend
         for (int i = 0; i < size; ++i)
@@ -212,49 +191,39 @@ public class Decomposition {
             residual.add(de_trend.get(i) - seasonal.get(i));
     }
 
-    private void constant_ext() {
-        int interval = period / 2;
-        for (int i = interval; i > 0; --i)
-            trend.set(i - 1, trend.get(i));
-        for (int i = trend.size() - interval - 1; i < trend.size() - 1; ++i)
-            trend.set(i + 1, trend.get(i));
-    }
+//    private void constant_ext() {
+//        int interval = period / 2;
+//        for (int i = interval; i > 0; --i)
+//            trend.set(i - 1, trend.get(i));
+//        for (int i = trend.size() - interval - 1; i < trend.size() - 1; ++i)
+//            trend.set(i + 1, trend.get(i));
+//    }
 
     private void ar_ext() {
-        // cal \sum x_t * x_{t-1}
-        double acf = 0;
-        double factor = 0;
-        double theta;
-        int acf_cnt = 0;
         int interval = period / 2;
-        for (int i = interval; i < trend.size() - interval - 1; ++i) {
-            double left = trend.get(i), right = trend.get(i + 1);
-            acf += left * right;
-            factor += left * left;
-            acf_cnt += 1;
-        }
-        acf /= acf_cnt;
-        theta = acf / factor;
-        assert theta < 1;
+        int end = trend.size() - interval - 1;
 
-        double mean_epsilon = 0;
-        double var_epsilon = 0;
-        double cnt_epsilon = 0;
-        double epsilon;
-        for (int i = interval; i < trend.size() - interval - 1; ++i) {
-            double left = trend.get(i), right = trend.get(i + 1);
-            cnt_epsilon += 1;
-            epsilon = right - left * theta;
-            mean_epsilon += epsilon;
-            var_epsilon += epsilon * epsilon;
+        double a = 0.0, b = 0.0, d = trend.size() - 2 * interval - 1, tmp;
+        for (int i = interval; i < end; ++i) {
+            b -= trend.get(i);
+            a += trend.get(i) * trend.get(i);
         }
-        mean_epsilon /= cnt_epsilon;
-        var_epsilon /= cnt_epsilon;
+        tmp = a * d - b * b;
+        a /= tmp;
+        b /= tmp;
+        d /= tmp;
 
+        double sigma = 0.0, a1 = 0.0;
+        for (int i = interval; i < end; ++i) {
+            sigma += (a + b * trend.get(i)) * trend.get(i + 1);
+            a1 += (b + d * trend.get(i)) * trend.get(i + 1);
+        }
+
+        // extend
         for (int i = interval; i > 0; --i)
-            trend.set(i - 1, (trend.get(i) - mean_epsilon) / theta);
+            trend.set(i - 1, (trend.get(i) - sigma) / a1);
         for (int i = trend.size() - interval - 1; i < trend.size() - 1; ++i)
-            trend.set(i + 1, theta * trend.get(i) + mean_epsilon);
+            trend.set(i + 1, a1 * trend.get(i) + sigma);
     }
 
     public ArrayList<Double> getSeasonal() {
