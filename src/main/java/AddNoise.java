@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class AddNoise {
-    private final ArrayList<Double> td_clean;
-    private final ArrayList<Double> td_dirty = new ArrayList<>();
+    private final double[] td_clean;
+    private final double[] td_dirty;
 
     private final int err_rate;  // error rate rate/1000
     private final double err_range;  // error range
@@ -18,8 +18,9 @@ public class AddNoise {
     private final double td_range;  // time series data range
     private final Random random;
 
-    public AddNoise(ArrayList<Double> td_clean, int rate, double range, int length, int seed) throws Exception {
+    public AddNoise(double[] td_clean, int rate, double range, int length, int seed) throws Exception {
         this.td_clean = td_clean;
+        this.td_dirty = new double[td_clean.length];
 
         this.err_rate = rate;
         this.err_range = range;
@@ -33,7 +34,7 @@ public class AddNoise {
 
     private double calRange() {  // data range
         double v_min = Double.MAX_VALUE, v_max = Double.MIN_VALUE;
-        for (Double value : this.td_clean) {
+        for (double value : this.td_clean) {
             if (value < v_min) v_min = value;
             if (value > v_max) v_max = value;
         }
@@ -43,7 +44,7 @@ public class AddNoise {
     private void addNoise() {
         int err_flag = 0;
         double err_range_now = 0.0;
-        for (Double value : this.td_clean) {
+        for (int i = 0; i < td_clean.length; i++) {
             int i1 = random.nextInt(1000);
             if (i1 < this.err_rate) {
                 err_flag = err_length;
@@ -52,16 +53,16 @@ public class AddNoise {
 
             if (err_flag > 0) {
                 --err_flag;
-                double new_value = value + err_range_now;
+                double new_value = td_clean[i] + err_range_now;
                 BigDecimal b = new BigDecimal(new_value);
-                this.td_dirty.add(b.setScale(8, RoundingMode.HALF_UP).doubleValue());
+                this.td_dirty[i] = b.setScale(8, RoundingMode.HALF_UP).doubleValue();
             } else {
-                this.td_dirty.add(value);
+                this.td_dirty[i] = td_clean[i];
             }
         }
     }
 
-    public ArrayList<Double> getTd_dirty() {
+    public double[] getTd_dirty() {
         return td_dirty;
     }
 
@@ -70,9 +71,9 @@ public class AddNoise {
         try {
             BufferedWriter writeText = new BufferedWriter(new FileWriter(writeFile));
             writeText.write("timestamp,value");
-            for (int j = 0; j < this.td_dirty.size(); j++) {
+            for (int j = 0; j < this.td_dirty.length; j++) {
                 writeText.newLine();
-                double val = this.td_dirty.get(j);
+                double val = this.td_dirty[j];
                 writeText.write(j + "," + val);
             }
             writeText.flush();

@@ -1,16 +1,13 @@
 package Algorithm;
 
 import Algorithm.util.LsgreedyUtil;
-import Algorithm.util.ScreenUtil;
-
-import java.util.ArrayList;
 
 public class Lsgreedy {
-    private final ArrayList<Long> td_time;
-    private final ArrayList<Double> td_dirty;
-    private final ArrayList<Double> td_repair = new ArrayList<>();
+    private final long[] td_time;
+    private final double[] td_dirty;
+    private double[] td_repair;
 
-    public Lsgreedy(ArrayList<Long> td_time, ArrayList<Double> td_dirty) throws Exception {
+    public Lsgreedy(long[] td_time, double[] td_dirty) throws Exception {
         this.td_time = td_time;
         this.td_dirty = td_dirty;
         long startTime = System.currentTimeMillis();
@@ -19,38 +16,13 @@ public class Lsgreedy {
         System.out.println("Lsgreedy time cost:" + (endTime - startTime) + "ms");
     }
 
-    public ArrayList<Double> getTd_repair() {
+    public double[] getTd_repair() {
         return td_repair;
     }
 
     private void repair() throws Exception {
-        long[] times = this.arrayListToListLong(this.td_time);
-        double[] temp_dirty = this.arrayListToListDouble(this.td_dirty);
-        double[] temp_repair;
-
-        LsgreedyUtil lsgreedyUtil = new LsgreedyUtil(times, temp_dirty);
+        LsgreedyUtil lsgreedyUtil = new LsgreedyUtil(td_time, td_dirty);
         lsgreedyUtil.repair();
-        temp_repair = lsgreedyUtil.getRepaired();
-
-        // listToArrayList
-        for (int i = 0; i < this.td_dirty.size(); i++) {
-            this.td_repair.add(temp_repair[i]);
-        }
-    }
-
-    private double[] arrayListToListDouble(ArrayList<Double> arrayList) {
-        double[] doubles = new double[arrayList.size()];
-        for (int i = 0; i < arrayList.size(); i++) {
-            doubles[i] = arrayList.get(i);
-        }
-        return doubles;
-    }
-
-    private long[] arrayListToListLong(ArrayList<Long> arrayList) {
-        long[] longs = new long[arrayList.size()];
-        for (int i = 0; i < arrayList.size(); i++) {
-            longs[i] = arrayList.get(i);
-        }
-        return longs;
+        td_repair = lsgreedyUtil.getRepaired();
     }
 }

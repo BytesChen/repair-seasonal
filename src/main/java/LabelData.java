@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.Random;
 import java.util.HashSet;
 
@@ -6,13 +5,13 @@ public class LabelData {
     private final HashSet<Integer> hs = new HashSet<Integer>();
     private final int size;
     private final int seed;
-    private final ArrayList<Double> td_clean;
-    private final ArrayList<Double> td_dirty;
+    private final double[] td_clean;
+    private final double[] td_dirty;
     private final double[] td_label;
     private final boolean[] td_bool;
 
-    public LabelData(ArrayList<Double> td_clean, ArrayList<Double> td_dirty, double rate, int seed) throws Exception {
-        size = td_clean.size();
+    public LabelData(double[] td_clean, double[] td_dirty, double rate, int seed) {
+        size = td_clean.length;
         this.td_clean = td_clean;
         this.td_dirty = td_dirty;
         this.td_label = new double[size];
@@ -45,10 +44,10 @@ public class LabelData {
         for (int i = 0; i < size; i++) {
             if (hs.contains(i)) {
                 td_bool[i] = true;
-                td_label[i] = td_clean.get(i);
+                td_label[i] = td_clean[i];
             } else {
                 td_bool[i] = false;
-                td_label[i] = td_dirty.get(i);
+                td_label[i] = td_dirty[i];
             }
         }
     }

@@ -36,11 +36,17 @@ public class LoadData {
             td_clean.set(i, (td_clean.get(i) - min_v) / (max_v - min_v) * 10.0);
     }
 
-    public ArrayList<Double> getTd_clean() {
-        return td_clean;
+    public double[] getTd_clean() {
+        double[] rtn = new double[td_clean.size()];
+        for (int i = 0; i < td_clean.size(); ++i)
+            rtn[i] = td_clean.get(i);
+        return rtn;
     }
 
-    public ArrayList<Long> getTd_time() {
-        return td_time;
+    public long[] getTd_time() {
+        long[] rtn = new long[td_time.size()];
+        for (int i = 0; i < td_time.size(); ++i)
+            rtn[i] = td_time.get(i);
+        return rtn;
     }
 }

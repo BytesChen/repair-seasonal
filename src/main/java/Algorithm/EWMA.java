@@ -1,35 +1,32 @@
 package Algorithm;
 
-import Algorithm.util.ScreenUtil;
-
-import java.util.ArrayList;
-
 public class EWMA {
-    private final ArrayList<Long> td_time;
-    private final ArrayList<Double> td_dirty;
-    private final ArrayList<Double> td_repair = new ArrayList<>();
+    private final long[] td_time;
+    private final double[] td_dirty;
+    private final double[] td_repair;
     private double beta = 0.2;
 
-    public EWMA(ArrayList<Long> td_time, ArrayList<Double> td_dirty) throws Exception {
+    public EWMA(long[] td_time, double[] td_dirty) throws Exception {
         this.td_time = td_time;
         this.td_dirty = td_dirty;
+        this.td_repair = new double[td_dirty.length];
         long startTime = System.currentTimeMillis();
         this.repair();
         long endTime = System.currentTimeMillis();
         System.out.println("EWMA time cost:" + (endTime - startTime) + "ms");
     }
 
-    public ArrayList<Double> getTd_repair() {
+    public double[] getTd_repair() {
         return td_repair;
     }
 
     private void repair() throws Exception {
-        double last_ewma = td_dirty.get(0);
-        td_repair.add(last_ewma);
+        double last_ewma = td_dirty[0];
+        td_repair[0] = last_ewma;
 
-        for (int i = 1; i < td_dirty.size(); ++i) {  // repair
-            double new_value = this.beta * last_ewma + (1 - beta) * td_dirty.get(i);
-            td_repair.add(new_value);
+        for (int i = 1; i < td_dirty.length; ++i) {  // repair
+            double new_value = this.beta * last_ewma + (1 - beta) * td_dirty[i];
+            td_repair[i] = new_value;
             last_ewma = new_value;
         }
     }

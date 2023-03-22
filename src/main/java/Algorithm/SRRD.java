@@ -6,26 +6,27 @@ import Algorithm.util.DualHeap;
 import Algorithm.util.Decomposition;
 
 public class SRRD {
-    private final ArrayList<Long> td_time;
-    private final ArrayList<Double> td_dirty;
-    private final ArrayList<Double> td_repair = new ArrayList<>();
+    private final long[] td_time;
+    private final double[] td_dirty;
+    private final double[] td_repair;
     private final int period;
     private final double k;  // k*mad
     private final int max_iter;
 
     private double mid, mad;
-    private ArrayList<Double> seasonal, trend, residual;
+    private double[] seasonal, trend, residual;
     private final DualHeap dh = new DualHeap();
     private final int size;
 
-    public SRRD(ArrayList<Long> td_time, ArrayList<Double> td_dirty, int period, double k, int max_iter) throws Exception {
+    public SRRD(long[] td_time, double[] td_dirty, int period, double k, int max_iter) throws Exception {
         this.td_time = td_time;
         this.td_dirty = td_dirty;
+        this.td_repair = new double[td_dirty.length];
         this.period = period;
         this.k = k;
         this.max_iter = max_iter;
 
-        this.size = td_dirty.size();
+        this.size = td_dirty.length;
 
         long startTime = System.currentTimeMillis();
         this.repair();
@@ -34,9 +35,10 @@ public class SRRD {
     }
 
     private void repair() throws Exception {
-        td_repair.addAll(td_dirty);
+        System.arraycopy(td_dirty, 0, td_repair, 0, td_dirty.length);
 
-        for (int h = 0; h < max_iter; ++h) {
+        int h = 0;
+        for (; h < max_iter; ++h) {
             Decomposition de = new Decomposition(td_time, td_repair, period, "robust");
             seasonal = de.getSeasonal();
             trend = de.getTrend();
@@ -46,13 +48,14 @@ public class SRRD {
 
             boolean flag = true;
             for (int i = 0; i < size; ++i) {
-                if (sub(residual.get(i), mid) > k * mad) {
+                if (sub(residual[i], mid) > k * mad) {
                     flag = false;
-                    td_repair.set(i, generate(i));
+                    td_repair[i] = generate(i);
                 }
             }
             if (flag) break;
         }
+        System.out.println("Stop after " + (h + 1) + " iterations");
     }
 
     private void estimate() throws Exception {
@@ -74,11 +77,11 @@ public class SRRD {
         double rtn;
         for (int j = 0; j < size / period; ++j)
             if (j * period + i != pos)  // remove anomaly
-                dh.insert(residual.get(j * period + i));
+                dh.insert(residual[j * period + i]);
         if (i < size % period && i + (size / period) * period != pos)
-            dh.insert(residual.get(i + (size / period) * period));
+            dh.insert(residual[i + (size / period) * period]);
 
-        rtn = dh.getMedian() + seasonal.get(pos) + trend.get(pos);
+        rtn = dh.getMedian() + seasonal[pos] + trend[pos];
         dh.clear();
         return rtn;
     }
@@ -87,7 +90,7 @@ public class SRRD {
         return a > b ? a - b : b - a;
     }
 
-    public ArrayList<Double> getTd_repair() {
+    public double[] getTd_repair() {
         return td_repair;
     }
 }
