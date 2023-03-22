@@ -7,26 +7,33 @@ import java.util.ArrayList;
 public class Analysis {
     private final ArrayList<Double> td_clean;
     private final ArrayList<Double> td_repair;
+    private final boolean[] td_bool;
 
     private double MAE;
     private double RMSE;
 
-    public Analysis(ArrayList<Long> td_time, ArrayList<Double> td_clean, ArrayList<Double> td_repair) {
+    public Analysis(ArrayList<Long> td_time, ArrayList<Double> td_clean, ArrayList<Double> td_repair, boolean[] td_bool) {
         this.td_clean = td_clean;
         this.td_repair = td_repair;
+        this.td_bool = td_bool;
 
         this.analysis();
     }
 
     public void analysis() {
-        int dataLen = td_clean.size();
+        int dataLen = td_clean.size(), labelNum = 0;
         for (int i = 0; i < dataLen; i++) {
+            if (td_bool[i]) {
+                labelNum++;
+                continue;
+            }
+
             this.MAE += Math.abs(td_clean.get(i) - td_repair.get(i));
             this.RMSE += Math.pow((td_clean.get(i) - td_repair.get(i)), 2);
         }
 
-        this.MAE = this.MAE / dataLen;
-        this.RMSE = Math.sqrt(this.RMSE / dataLen);
+        this.MAE = this.MAE / (dataLen - labelNum);
+        this.RMSE = Math.sqrt(this.RMSE / (dataLen - labelNum));
     }
 
     public String getMAE() {
