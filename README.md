@@ -1,4 +1,4 @@
-# SeasoalRepair
+# SeasonalRepair
 
 Seasonal time series data cleaning via decomposition.
 
