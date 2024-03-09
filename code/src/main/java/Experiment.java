@@ -8,7 +8,7 @@ import java.util.NavigableMap;
 import java.util.Objects;
 
 public class Experiment {
-    private static final String INPUT_DIR = "";
+    private static final String INPUT_DIR = "";  // need to fill in according to the location of the dataset
     private static final String OUTPUT_DIR = "";
     // dataset
     private static final String[] datasetFileList = {
@@ -230,6 +230,8 @@ public class Experiment {
     }
 
     public static void main(String[] args) throws Exception {
+        if (INPUT_DIR == "")
+            throw new Exception("The location of the dataset needs to be specified.");
         main_cmp();
     }
 }

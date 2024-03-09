@@ -15,7 +15,7 @@ Dev Environment:
 ## Run
 
 ```
-mvn clean compile assembly:single 
+mvn clean package -DskipTests
 cd target
-java -jar .\seasonal-1.0-SNAPSHOT-jar-with-dependencies.jar
+java -jar seasonal-1.0-SNAPSHOT.jar
 ```
